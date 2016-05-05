@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Created by Scott on 4/5/2016.
+ * For CSCI342 Assignment 2
  */
 public class ScrapbookModel extends SQLiteOpenHelper
 {
@@ -51,7 +52,6 @@ public class ScrapbookModel extends SQLiteOpenHelper
         String CREATE_CLIPPINGS_TABLE = "CREATE TABLE " + TABLE_CLIPPINGS +
                 "("
                 + KEY_ID + " INTEGER, "
-                + KEY_NAME + " TEXT, "
                 + KEY_IMG + " INTEGER, "
                 + KEY_NOTES + " TEXT, "
                 + KEY_RID + " INTEGER REFERENCES " + TABLE_COLLECTION + "(" + KEY_ID + "), " +
@@ -95,12 +95,11 @@ public class ScrapbookModel extends SQLiteOpenHelper
         ContentValues vals = new ContentValues();
         //Collection Name
         vals.put(KEY_ID, clip.getId());
-        vals.put(KEY_NAME, clip.getName());
         vals.put(KEY_IMG, clip.getImg());
         vals.put(KEY_NOTES, clip.getNotes());
         vals.put(KEY_RID, clip.getRid());
         //Insert row
-        Log.d("Insert", "Inserted: " + clip.getId() + ", " + clip.getName() + ", " + clip.getRid());
+        Log.d("Insert", "Inserted: " + clip.getId() + ", " + clip.getNotes() + ", REFERENCES (" + clip.getRid() + ")");
         db.insert(TABLE_CLIPPINGS, null, vals);
         //close DB connection
         db.close();
@@ -114,9 +113,11 @@ public class ScrapbookModel extends SQLiteOpenHelper
         {
             cursor.moveToFirst();
         }
-        Collection col = new Collection(Integer.parseInt(cursor.getString(0)), cursor.getString(1));
-        //return Collection
-        return col;
+        else
+        {
+            return new Collection(999, "Invalid");
+        }
+        return new Collection(Integer.parseInt(cursor.getString(0)), cursor.getString(1));
     }
 
     public Clipping getClipping(int id)
@@ -127,14 +128,16 @@ public class ScrapbookModel extends SQLiteOpenHelper
         {
             cursor.moveToFirst();
         }
-        Clipping clip = new Clipping(Integer.parseInt(cursor.getString(0)), cursor.getString(1), Integer.parseInt(cursor.getString(2)), cursor.getString(3), Integer.parseInt(cursor.getString(4)));
-        //return Clipping
-        return clip;
+        else
+        {
+            return new Clipping(999, 0, "Invalid", 0);
+        }
+        return new Clipping(Integer.parseInt(cursor.getString(0)), Integer.parseInt(cursor.getString(1)), cursor.getString(2), Integer.parseInt(cursor.getString(3)));
     }
 
     public List<Collection> getAllCollections() {
         //Select All Query
-        List<Collection> colList = new ArrayList<Collection>();
+        List<Collection> colList = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM " + TABLE_COLLECTION;
         SQLiteDatabase db = this.getWritableDatabase();
@@ -156,7 +159,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
 
     public List<Clipping> getAllClippings() {
         //Select All Query
-        List<Clipping> colList = new ArrayList<Clipping>();
+        List<Clipping> colList = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM " + TABLE_CLIPPINGS;
         SQLiteDatabase db = this.getWritableDatabase();
@@ -167,10 +170,9 @@ public class ScrapbookModel extends SQLiteOpenHelper
             do {
                 Clipping clip = new Clipping();
                 clip.setId(Integer.parseInt(cursor.getString(0)));
-                clip.setName(cursor.getString(1));
-                clip.setImg(Integer.parseInt(cursor.getString(2)));
-                clip.setNotes(cursor.getString(3));
-                clip.setRid(Integer.parseInt(cursor.getString(4)));
+                clip.setImg(Integer.parseInt(cursor.getString(1)));
+                clip.setNotes(cursor.getString(2));
+                clip.setRid(Integer.parseInt(cursor.getString(3)));
                 //Add to list
                 colList.add(clip);
             }
@@ -181,7 +183,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
 
     public List<Clipping> getClipingsForCollection(int id) {
         //Select All Query
-        List<Clipping> colList = new ArrayList<Clipping>();
+        List<Clipping> colList = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM " + TABLE_CLIPPINGS + " WHERE " + KEY_RID + " = " + String.valueOf(id);
         SQLiteDatabase db = this.getWritableDatabase();
@@ -192,10 +194,9 @@ public class ScrapbookModel extends SQLiteOpenHelper
             do {
                 Clipping clip = new Clipping();
                 clip.setId(Integer.parseInt(cursor.getString(0)));
-                clip.setName(cursor.getString(1));
-                clip.setImg(Integer.parseInt(cursor.getString(2)));
-                clip.setNotes(cursor.getString(3));
-                clip.setRid(Integer.parseInt(cursor.getString(4)));
+                clip.setImg(Integer.parseInt(cursor.getString(1)));
+                clip.setNotes(cursor.getString(2));
+                clip.setRid(Integer.parseInt(cursor.getString(3)));
                 //Add to list
                 colList.add(clip);
             }
@@ -213,9 +214,9 @@ public class ScrapbookModel extends SQLiteOpenHelper
         return cursor.getCount();
     }
 
-    public int getClippingCount()
+    public int getClippingsForCollectionCount(int id)
     {
-        String countQuery = "SELECT * FROM " + TABLE_CLIPPINGS;
+        String countQuery = "SELECT * FROM " + TABLE_CLIPPINGS + " WHERE " + KEY_RID + " = " + String.valueOf(id);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         return cursor.getCount();
@@ -231,7 +232,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
         vals.put(KEY_NAME, col.getName());
 
         // Update table
-        return db.update(TABLE_COLLECTION, vals, KEY_ID + " ?", new String[]{String.valueOf(col.getId())});
+        return db.update(TABLE_COLLECTION, vals, KEY_ID + " =?", new String[]{String.valueOf(col.getId())});
     }
 
     public int updateClipping(Clipping clip)
@@ -241,13 +242,75 @@ public class ScrapbookModel extends SQLiteOpenHelper
 
         // Set up values to update
         ContentValues vals = new ContentValues();
-        vals.put(KEY_NAME, clip.getName());
         vals.put(KEY_IMG, clip.getImg());
         vals.put(KEY_NOTES, clip.getNotes());
         vals.put(KEY_RID, clip.getRid());
 
         // Update table
-        return db.update(TABLE_CLIPPINGS, vals, KEY_ID + " ?", new String[]{String.valueOf(clip.getId())});
+        return db.update(TABLE_CLIPPINGS, vals, KEY_ID + " =?", new String[]{String.valueOf(clip.getId())});
+    }
+
+    public int addClippingtoCollection(int clipID, int colID)
+    {
+        // Connect to database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Set up values to update
+        ContentValues vals = new ContentValues();
+        vals.put(KEY_RID, colID);
+
+        // Update table
+        return db.update(TABLE_CLIPPINGS, vals, KEY_ID + " =?", new String[]{String.valueOf(clipID)});
+    }
+
+    public List<Clipping> getClippingWithNote(String token)
+    {
+        //Select All Query
+        List<Clipping> colList = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + TABLE_CLIPPINGS + " WHERE " + KEY_NOTES + " LIKE '%" + token +"%'";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        //put all rows into list
+        if (cursor.moveToFirst()) {
+            do {
+                Clipping clip = new Clipping();
+                clip.setId(Integer.parseInt(cursor.getString(0)));
+                clip.setImg(Integer.parseInt(cursor.getString(1)));
+                clip.setNotes(cursor.getString(2));
+                clip.setRid(Integer.parseInt(cursor.getString(3)));
+                //Add to list
+                colList.add(clip);
+            }
+            while (cursor.moveToNext());
+        }
+        return colList;
+    }
+
+    public List<Clipping> getClippingWithNote(String token, int rid)
+    {
+        //Select All Query
+        List<Clipping> colList = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + TABLE_CLIPPINGS + " WHERE " + KEY_NOTES + " LIKE '%" + token +"%' AND " + KEY_RID + " = " +String.valueOf(rid);
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        //put all rows into list
+        if (cursor.moveToFirst()) {
+            do {
+                Clipping clip = new Clipping();
+                clip.setId(Integer.parseInt(cursor.getString(0)));
+                clip.setImg(Integer.parseInt(cursor.getString(1)));
+                clip.setNotes(cursor.getString(2));
+                clip.setRid(Integer.parseInt(cursor.getString(3)));
+                //Add to list
+                colList.add(clip);
+            }
+            while (cursor.moveToNext());
+        }
+        return colList;
     }
 
     public void deleteCollection(Collection col)

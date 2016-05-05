@@ -1,11 +1,12 @@
 package com.example.scott.assignment2;
 
-import android.media.Image;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Created by Scott on 5/5/2016.
+ * For CSCI342 Assignment 2
  */
 public class Clipping {
 
@@ -14,9 +15,6 @@ public class Clipping {
 
     //Unique id
     private int id;
-
-    //Name of picture
-    private String name;
 
     //Image of picture
     private int img;
@@ -27,10 +25,9 @@ public class Clipping {
     //Date of creation
     private Date date;
 
-    public Clipping(int id, String name, int img, String notes, int rid)
+    public Clipping(int id, int img, String notes, int rid)
     {
         this.id = id;
-        this.name = name;
         this.img = img;
         this.notes = notes;
         this.rid = rid;
@@ -39,7 +36,6 @@ public class Clipping {
 
     public Clipping() {
         id = 999;
-        name = "default";
         img = 999;
         notes = "this is a blank image";
         date = new Date();
@@ -49,11 +45,6 @@ public class Clipping {
     public void setId(int id)
     {
         this.id = id;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public void setRid(int rid)
@@ -81,11 +72,6 @@ public class Clipping {
         return id;
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
     public int getRid()
     {
         return rid;
@@ -101,8 +87,9 @@ public class Clipping {
         return notes;
     }
 
-    public Date getDate()
+    public String getDate()
     {
-        return date;
+        SimpleDateFormat dateMade = new SimpleDateFormat ("dd:MM:yyyy");
+        return dateMade.format(date);
     }
 }
