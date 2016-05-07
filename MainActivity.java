@@ -1,27 +1,84 @@
 package com.example.scott.assignment2;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener
 {
     private ScrapbookModel db;
+    private ListView l;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageView image = (ImageView) findViewById(R.id.test_image);
-
-        ScrapbookModel db = new ScrapbookModel(this);
+        final ScrapbookModel db = new ScrapbookModel(this);
 
         Log.d("DROP", "DROPING TABLES");
         db.dropAll();
 
+
+        db.addCollection(new Collection(db.getCollectionCount(), "People"));
+        db.addCollection(new Collection(db.getCollectionCount(), "Places"));
+        db.addCollection(new Collection(db.getCollectionCount(), "Things"));
+
+        //setup data for array adapter
+        List<Collection> tempList = db.getAllCollections();
+        List<String> colList = new ArrayList<>();
+        for(Collection col : tempList)
+        {
+            colList.add(col.getName());
+        }
+
+        //setup list
+        l = (ListView) findViewById(R.id.listView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, colList);
+        l.setAdapter(adapter);
+        l.setOnItemClickListener(this);
+
+        FragmentManager FM = getFragmentManager();
+        FragmentTransaction FT = FM.beginTransaction();
+        FragmentCollectionCreate F1 = new FragmentCollectionCreate();
+
+        if(getFragmentManager().findFragmentById(R.id.fr_id) == null)
+        {
+            FT.add(R.id.fr_id, F1);
+            FT.addToBackStack("f1");
+        }
+        FT.commit();
+
+        //runQueries();
+        //runTests();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public void runQueries()
+    {
         /* * * * QUERY 1 * * * */
         // Insert into database
         Log.d("Insert", "Inserting: ");
@@ -36,12 +93,12 @@ public class MainActivity extends AppCompatActivity
 
         /* * * * QUERY 3 * * * */
         //Insert Clippings into the database
-        db.addClipping(new Clipping(0, R.id.test_image, "space pictureno", 0));
-        db.addClipping(new Clipping(1, R.id.test_image, "dace pictureno", 0));
-        db.addClipping(new Clipping(2, R.id.test_image, "mace pictureno", 0));
-        db.addClipping(new Clipping(3, R.id.test_image, "pace pictureno", 0));
-        db.addClipping(new Clipping(4, R.id.test_image, "lace pictureno", 2));
-        db.addClipping(new Clipping(5, R.id.test_image, "space pictureno", 2));
+        db.addClipping(new Clipping(0, R.drawable.testimg, "space pictureno", 0));
+        db.addClipping(new Clipping(1, R.drawable.testimg, "dace pictureno", 0));
+        db.addClipping(new Clipping(2, R.drawable.testimg, "mace pictureno", 0));
+        db.addClipping(new Clipping(3, R.drawable.testimg, "pace pictureno", 0));
+        db.addClipping(new Clipping(4, R.drawable.testimg, "lace pictureno", 2));
+        db.addClipping(new Clipping(5, R.drawable.testimg, "space pictureno", 2));
 
         /* * * * QUERY 4 * * * */
         List<Clipping> clipList = db.getClipingsForCollection(0);
@@ -58,7 +115,7 @@ public class MainActivity extends AppCompatActivity
         printCollections(colList);
 
         /* * * * QUERY 7 * * * */
-        db.deleteClipping(new Clipping(2, R.id.test_image, "mace pictureno", 0));
+        db.deleteClipping(new Clipping(2, R.drawable.testimg, "mace pictureno", 0));
         clipList = db.getClipingsForCollection(0);
         printClippings(clipList);
 
@@ -71,10 +128,13 @@ public class MainActivity extends AppCompatActivity
         //pass both note to find and collection id
         clipList = db.getClippingWithNote("space", 0);
         printClippings(clipList);
+    }
 
-
+    public void runTests()
+    {
         /* * * * Testing Database * * * */
-
+        List<Clipping> clipList;
+        List<Collection> colList;
         //  TEST 1
         Log.d("TEST 1", "**************TEST 1********************");
         db = new ScrapbookModel(this);
@@ -90,9 +150,9 @@ public class MainActivity extends AppCompatActivity
 
         //  TEST 3
         Log.d("TEST 3", "**************TEST 3********************");
-        Clipping one = new Clipping(0, R.id.test_image, "foo", X.getId());
-        Clipping two = new Clipping(1, R.id.test_image, "foo", X.getId());
-        Clipping three = new Clipping(2, R.id.test_image, "bar", X.getId());
+        Clipping one = new Clipping(0, R.drawable.testimg, "foo", X.getId());
+        Clipping two = new Clipping(1, R.drawable.testimg, "foo", X.getId());
+        Clipping three = new Clipping(2, R.drawable.testimg, "bar", X.getId());
         db.addClipping(one);
         db.addClipping(two);
         db.addClipping(three);
@@ -161,5 +221,4 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d("ClipEnd          ", "*****************************");
     }
-
 }

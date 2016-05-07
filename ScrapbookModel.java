@@ -45,7 +45,8 @@ public class ScrapbookModel extends SQLiteOpenHelper
                 "("
                 + KEY_ID + " INTEGER, "
                 + KEY_NAME + " TEXT, " +
-                "PRIMARY KEY (" + KEY_ID + ")" +
+                "PRIMARY KEY (" + KEY_ID + ", " + KEY_NAME + ")," +
+                "UNIQUE (" + KEY_NAME + ")" +
                 ")";
         db.execSQL(CREATE_COLLECTION_TABLE);
 
@@ -105,11 +106,11 @@ public class ScrapbookModel extends SQLiteOpenHelper
         db.close();
     }
 
-    public Collection getCollection(int id)
+    public Collection getCollection(String name)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_COLLECTION, new String[]{KEY_NAME}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
-        if(cursor != null)
+        Cursor cursor = db.query(TABLE_COLLECTION, new String[]{KEY_ID, KEY_NAME}, KEY_NAME + "=?", new String[]{name}, null, null, null, null);
+        if(cursor != null && cursor.getCount() > 0)
         {
             cursor.moveToFirst();
         }
@@ -123,7 +124,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
     public Clipping getClipping(int id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CLIPPINGS, new String[]{KEY_NAME}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
+        Cursor cursor = db.query(TABLE_CLIPPINGS, new String[]{KEY_ID, KEY_NAME, KEY_IMG, KEY_RID}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
         if(cursor != null)
         {
             cursor.moveToFirst();
