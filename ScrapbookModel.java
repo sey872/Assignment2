@@ -111,7 +111,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_COLLECTION, new String[]{KEY_ID, KEY_NAME}, KEY_NAME + "=?", new String[]{name}, null, null, null, null);
-        if(cursor != null && cursor.getCount() > 0)
+        if(cursor != null)
         {
             cursor.moveToFirst();
         }
@@ -125,7 +125,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
     public Clipping getClipping(int id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CLIPPINGS, new String[]{KEY_ID, KEY_NAME, KEY_IMG, KEY_RID}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
+        Cursor cursor = db.query(TABLE_CLIPPINGS, new String[]{KEY_ID, KEY_IMG, KEY_NOTES, KEY_RID}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
         if(cursor != null)
         {
             cursor.moveToFirst();

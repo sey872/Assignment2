@@ -89,7 +89,8 @@ public class Clipping {
 
     public String getDate()
     {
-        SimpleDateFormat dateMade = new SimpleDateFormat ("dd:MM:yyyy");
-        return dateMade.format(date);
+        SimpleDateFormat dateMade = new SimpleDateFormat ("dd/MM");
+        String toReturn = "Date: " + dateMade.format(date);
+        return toReturn;
     }
 }

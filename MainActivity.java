@@ -53,9 +53,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             colList.add(col.getName());
         }
 
-        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.lake, "Jackson's a lil bitch", 0));
-        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.question, "Jackson's work is worse", 1));
-        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.cathedral, "Jackson should give up", 2));
+        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.lake, "My notes are great", 1));
+        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.question, "Atleast you can test", 2));
+        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.cathedral, "Maybe font size is too big", 3));
         //setup list
         l = (ListView) findViewById(R.id.listView);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, colList);
@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(getFragmentManager().findFragmentById(R.id.fr_id) == null)
         {
             FT.add(R.id.fr_id, F1);
-            FT.addToBackStack("f1");
         }
         FT.commit();
 
@@ -82,14 +81,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         FragmentManager FM = getFragmentManager();
         FragmentTransaction FT = FM.beginTransaction();
         FragmentShowClippings F2 = new FragmentShowClippings();
-        /*Bundle bundle = new Bundle();
-        String test = l.getItemAtPosition(position).toString();
-        Log.d("test was", test);
-        Collection test2 = db.getCollection(test);
-        Log.d("test2 was", String.valueOf(test2));
-        String msg = String.valueOf(test2.getId());
+
+        Bundle bundle = new Bundle();
+        String msg = String.valueOf(position);
         bundle.putString("message", msg);
-        F2.setArguments(bundle);*/
+        F2.setArguments(bundle);
 
         if(getFragmentManager().findFragmentById(R.id.fr_show_clip) == null)
         {

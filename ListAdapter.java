@@ -10,8 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,8 @@ public class ListAdapter extends ArrayAdapter<Clipping> {
         if (p != null) {
             ImageView tt1 = (ImageView) v.findViewById(R.id.row_Image);
             TextView tt2 = (TextView) v.findViewById(R.id.row_Note);
+            TextView tt3 = (TextView) v.findViewById(R.id.row_Date);
+            Button tt4 = (Button) v.findViewById(R.id.but_del);
 
             if (tt1 != null) {
                 tt1.setImageResource(p.getImg());
@@ -54,13 +59,23 @@ public class ListAdapter extends ArrayAdapter<Clipping> {
             if (tt2 != null) {
                 tt2.setText(p.getNotes());
             }
-        }
 
-        if (v == null)
-        {
-            Log.d("hi", "wtf now");
-        }
+            if(tt3 != null){
+                tt3.setText(p.getDate());
+            }
 
+            final int pos = position;
+/*
+            if(tt4 != null)
+            {
+                tt4.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        db.deleteClipping(pos);
+                        Toast.makeText(v, "Deleted Clipping.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }*/
+        }
         return v;
     }
 
