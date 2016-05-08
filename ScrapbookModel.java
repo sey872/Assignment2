@@ -59,6 +59,7 @@ public class ScrapbookModel extends SQLiteOpenHelper
                 "PRIMARY KEY (" + KEY_ID + ")" +
                 ")";
         db.execSQL(CREATE_CLIPPINGS_TABLE);
+        addCollection(new Collection(getCollectionCount(), "All Clippings"));
     }
 
     @Override
@@ -210,6 +211,14 @@ public class ScrapbookModel extends SQLiteOpenHelper
     public int getCollectionCount()
     {
         String countQuery = "SELECT * FROM " + TABLE_COLLECTION;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        return cursor.getCount();
+    }
+
+    public int getClippingsCount()
+    {
+        String countQuery = "SELECT * FROM " + TABLE_CLIPPINGS;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         return cursor.getCount();

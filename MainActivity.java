@@ -2,16 +2,24 @@ package com.example.scott.assignment2;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 {
     private ScrapbookModel db;
     private ListView l;
+
+    private final int SELECT_PHOTO = 1;
+    public ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         final ScrapbookModel db = new ScrapbookModel(this);
 
-        Log.d("DROP", "DROPING TABLES");
+        Log.d("DROP", "DROPPING TABLES");
         db.dropAll();
 
 
@@ -42,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             colList.add(col.getName());
         }
 
+        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.lake, "Jackson's a lil bitch", 0));
+        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.question, "Jackson's work is worse", 1));
+        db.addClipping(new Clipping(db.getClippingsCount(), R.drawable.cathedral, "Jackson should give up", 2));
         //setup list
         l = (ListView) findViewById(R.id.listView);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, colList);
@@ -65,7 +79,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        FragmentManager FM = getFragmentManager();
+        FragmentTransaction FT = FM.beginTransaction();
+        FragmentShowClippings F2 = new FragmentShowClippings();
+        /*Bundle bundle = new Bundle();
+        String test = l.getItemAtPosition(position).toString();
+        Log.d("test was", test);
+        Collection test2 = db.getCollection(test);
+        Log.d("test2 was", String.valueOf(test2));
+        String msg = String.valueOf(test2.getId());
+        bundle.putString("message", msg);
+        F2.setArguments(bundle);*/
 
+        if(getFragmentManager().findFragmentById(R.id.fr_show_clip) == null)
+        {
+            FT.add(R.id.fr_show_clip, F2);
+            FT.addToBackStack("f2");
+        }
+        FT.commit();
     }
 
     @Override
@@ -82,9 +113,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         /* * * * QUERY 1 * * * */
         // Insert into database
         Log.d("Insert", "Inserting: ");
-        db.addCollection(new Collection(0, "People"));
-        db.addCollection(new Collection(1, "Places"));
-        db.addCollection(new Collection(2, "Things"));
+        db.addCollection(new Collection(db.getCollectionCount(), "People"));
+        db.addCollection(new Collection(db.getCollectionCount(), "Places"));
+        db.addCollection(new Collection(db.getCollectionCount(), "Things"));
 
         /* * * * QUERY 2 * * * */
         List<Collection> colList = db.getAllCollections();
@@ -142,9 +173,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //  TEST 2
         Log.d("TEST 2", "**************TEST 2********************");
-        Collection X = new Collection(0, "Deadzone");
-        Collection A = new Collection(1, "A");
-        Collection B = new Collection(2, "B");
+        Collection X = new Collection(db.getCollectionCount(), "Deadzone");
+        Collection A = new Collection(db.getCollectionCount(), "A");
+        Collection B = new Collection(db.getCollectionCount(), "B");
         db.addCollection(A);
         db.addCollection(B);
 

@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class FragmentCollectionCreate extends Fragment
 {
-    private int numCollections;
     private ListView l;
 
     @Override
@@ -58,7 +57,6 @@ public class FragmentCollectionCreate extends Fragment
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, colList);
                     l.setAdapter(adapter);
                 }
-                //getActivity().getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.fr_id)).commit();
             }
         });
 
